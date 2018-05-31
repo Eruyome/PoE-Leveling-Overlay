@@ -66,6 +66,7 @@ Return
 ;
  
 ;========== Quest Rewards =======
+#IfWinActive, ahk_group PoEWindowGrp
 +F3::
     if (gui_2_toggle = 0)
     {
@@ -90,6 +91,7 @@ return
  
  
 ;========== XP Range =======
+#IfWinActive, ahk_group PoEWindowGrp
 +F4::
     if (gui_1_toggle = 0)
     {
@@ -104,7 +106,8 @@ return
 return
  
 ;========== Zone Layouts =======
-+F1::   
+#IfWinActive, ahk_group PoEWindowGrp
++F1::
     if (gui_3_toggle = 0)
     {
         Gosub, DrawGUI3_1
@@ -112,22 +115,30 @@ return
     else
     {
         Gui, 3:Destroy
+        Gui, Controls:Destroy
+        Loop, % maxImages {
+            Gui, Image%A_Index%:Destroy
+        }        
         gui_3_toggle := 0
     }
     Gosub, ActivatePOE
 return
 
+#IfWinActive, ahk_group PoEWindowGrp
 ^F1::
     GuiControl, Choose,DdlA,3
 return
 
+#IfWinActive, ahk_group PoEWindowGrp
 !F1::
     Control, Choose,DdlA,2
 return
 
+#IfWinActive, ahk_group PoEWindowGrp
 ^F2::
 return
 
+#IfWinActive, ahk_group PoEWindowGrp
 !F2::
 return
 
@@ -141,23 +152,24 @@ return
 DrawGUI1:
     Gui, 1:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop +hwndXpWindow
     Gui, 1:Font, s9, Consolas
-
+    
     xp_ranges = 
     (LTrim
     XP Range
-    1-15 | 3
+    1-15  | 3
     16-31 | 4    
     32-47 | 5
     48-63 | 6
     64-79 | 7
-    80+ | 8
+    80+   | 8
     )
     Gui, 1:Add, Text, x5 y+5, % xp_ranges
 
     CalculateCellTextDimensions(xp_ranges, 9, "Consolas", xp_height, xp_width)
     _width := xp_width
     _height:= xp_height + 10
-    Gui, 1:Show, x%xPosXPRange% y5 w%_width% h%_height%, Gui 1
+    
+    Gui, 1:Show, x%xPosXPRange% y5 w%_width% h%_height%
     gui_1_toggle := 1
 return
  
@@ -192,11 +204,12 @@ DrawGUI2_1:
 			}
 	}
     Gui, 2:Add, Text, x5 y+5, % skillText
-    
+
     CalculateCellTextDimensions(skillText, 9, "Arial", skill_height, skill_width)
-    skillsWidth := (skill_width > skillsWidth) ? skillsWidth : skill_width
+    skill_width := (skill_width > skillsWidth) ? skillsWidth : skill_width
     _height:= skill_height + 10
-    Gui, 2:Show, x%xPosSkills% y5 w%skillsWidth% h%_height%, Gui 2
+    
+    Gui, 2:Show, x%xPosSkills% y5 w%skill_width% h%_height%, Gui 2
     gui_2_toggle := 1
 return
 
@@ -341,25 +354,27 @@ ShowGuiTimer:
 return
 
 ShowAllWindows:
-    If (not layout_active) {
-        Gui, Parent:Show, NoActivate
-    }
-    If (not controls_active) {
-        Gui, Controls:Show, NoActivate
-        Gui, Controls:+OwnerParent
-    }
-    
-    If (not image_active) {
-        Loop, % maxImages {
-            Gui, Image%A_Index%:Show, NoActivate
-            Gui, Image%A_Index%:+OwnerParent
+    If (gui_3_toggle) {
+        If (not layout_active) {
+            Gui, Parent:Show, NoActivate
+        }
+        If (not controls_active) {
+            Gui, Controls:Show, NoActivate
+            Gui, Controls:+OwnerParent
+        }
+        
+        If (not image_active) {
+            Loop, % maxImages {
+                Gui, Image%A_Index%:Show, NoActivate
+                Gui, Image%A_Index%:+OwnerParent
+            }
         }
     }
     
-    If (not skills_active) {
+    If (not skills_active and gui_1_toggle) {
         Gui, 1:Show, NoActivate
     }    
-    If (not xp_active) {
+    If (not xp_active and gui_2_toggle) {
         Gui, 2:Show, NoActivate
     }
 return
@@ -391,6 +406,8 @@ return
 ; ==================================================================================================================================
 CalculateCellTextDimensions(value, fontSize, font, ByRef height = 0, ByRef width = 0, ByRef newValue = "") {
     value := RegExReplace(value, "\r|\n$")
+    height := 0
+    width := 0
     Loop, Parse, value, `n, `r
     {
         string := A_LoopField			
@@ -411,7 +428,7 @@ CalculateCellTextDimensions(value, fontSize, font, ByRef height = 0, ByRef width
         }
 
         If (StrLen(string)) {
-            size := Font_DrawText(string, "", "s" fontSize ", " font, "CALCRECT SINGLELINE NOCLIP")								
+            size := Font_DrawText(string, "", "s" fontSize ", " font, "CALCRECT SINGLELINE NOCLIP")          
             width := width > size.W ? width : size.W
             height += size.H
         }
