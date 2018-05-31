@@ -32,6 +32,12 @@ gui_1_toggle := 0
 gui_2_toggle := 0
 linenumber := 1
 
+global maxImages := 5
+global xPosLayoutParent := Round(A_ScreenWidth / 2) - Round(((maxImages * 110) + (maxImages * A_Index)) / 2)
+global xPosSkills := xPosLayoutParent + ((maxImages * 110) + (maxImages * A_Index))
+global skillsWidth := 330
+global xPosXPRange := xPosSkills + skillsWidth + 5
+
 global PoEWindowHwnd := ""
 WinGet, PoEWindowHwnd, ID, ahk_group PoEWindowGrp
 
@@ -126,7 +132,7 @@ ActivatePOE:
 return
  
 DrawGUI1:
-    Gui, 1:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop
+    Gui, 1:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop +hwndXpWindow
     Gui, 1:Add, Text, x0 y5, XP Range
     Gui, 1:Add, Text, x0 y+5, 1-15 | 3
     Gui, 1:Add, Text, x0 y+5, 16-31 | 4
@@ -134,7 +140,8 @@ DrawGUI1:
     Gui, 1:Add, Text, x0 y+5, 48-63 | 6
     Gui, 1:Add, Text, x0 y+5, 64-79 | 7
     Gui, 1:Add, Text, x0 y+5, 80+ | 8
-    Gui, 1:Show, x1580 y8 w60 h130, Gui 1
+    
+    Gui, 1:Show, x%xPosXPRange% y8 w60 h130, Gui 1    
     gui_1_toggle := 1
 return
  
@@ -167,8 +174,8 @@ DrawGUI2_1:
 				break
 			}
 	}
-    
-    Gui, 2:Show, x1248 y8 w330 h180, Gui 2
+
+    Gui, 2:Show, x%xPosSkills% y8 w%skillsWidth% h180, Gui 2
     gui_2_toggle := 1
 return
 
@@ -177,14 +184,14 @@ DrawGUI3_1:
     Gui, Parent:Color, brown
     Gui, Parent:Show, w800 h100 x500 y5
     WinSet, TransColor, brown, A
+    
     ; make tooltip clickthrough and remove borders
 	WinSet, ExStyle, +0x20, ahk_id %ParentWindow% ; 0x20 = WS_EX_CLICKTHROUGH
     WinSet, Style, -0xC00000, ahk_id %ParentWindow%
     
-    xParent := 696
-    Loop, 5 {
+    Loop, % maxImages {
         filepath := "" A_ScriptDir "\Overlays\" data.DdlA "\" data.DdlZ "_Seed_" A_Index ".jpg" ""
-        xPos := xParent + (A_Index - 1) * 110 + (5 * A_Index)
+        xPos := xPosLayoutParent + (A_Index - 1) * 110 + (5 * A_Index)
 
         If (FileExist(filepath)) {
             Gui, Image%A_Index%:New, -resize -SysMenu -Caption +AlwaysOnTop
@@ -193,9 +200,6 @@ DrawGUI3_1:
             Gui, Image%A_Index%:+OwnerParent
             Gui, Image%A_Index%: +LastFound
             SubhWnd := WinExist()
-            ;DllCall("SetParent", "uint", SubhWnd, "uint", Layouts)
-
-            WinGetPos, X, Y, Width, Height, ahk_id %SubhWnd%
         }        
     }
     
@@ -204,9 +208,8 @@ DrawGUI3_1:
     Gui, Controls:Add, DropDownList, VDdlA GchangeAct x0 y0 w90 h200 , % GetDelimitedActListString(data.zones, "Act I")
     Gui, Controls:Add, DropDownList, VDdlZ GchangeZone x+5 y0 w120 h250 , % GetDelimitedZoneListString(data.zones, "Act I")
     Gui, Controls:+OwnerParent
-    xPos := xParent + 5
+    xPos := xPosLayoutParent + 5
     Gui, Controls:Show, h21 w215 x%xPos% y88, Controls
-    ;DllCall("SetParent", ptr, Controls, ptr, Layouts)
 
     gui_3_toggle := 1
 return
@@ -251,29 +254,29 @@ GetDefaultZone(zones, act) {
 changeAct:
     Gui, Controls:Submit, NoHide
     
-    Loop, 5 {
+    Loop, % maxImages {
         Gui, Image%A_Index%:Submit, NoHide    
     }
     
     GuiControl,,DdlZ, % "|" GetDelimitedZoneListString(data.zones, DdlA)
     DdlZ := GetDefaultZone(data.zones, DdlA)
-    
-    Loop, 5 {
+
+    Loop, % maxImages {
         filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""    
-        GuiControl,,Pic%A_Index%, *w110 *h80 %filepath%
+        GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%
     }
 return
 
 changeZone:
     Gui, Controls:Submit, NoHide
     
-    Loop, 5 {
-        Gui, Image%A_Index%:Submit, NoHide    
+    Loop, % maxImages {
+        Gui, Image%A_Index%:Submit, NoHide
     }
     
-    Loop, 5 {
+    Loop, % maxImages {
         filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""
-        GuiControl,,Pic%A_Index%, *w110 *h80 %filepath%
+        GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%
     }
 return
 
