@@ -7,6 +7,9 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #Include, %A_ScriptDir%\lib\JSON.ahk
 ;#Include, %A_ScriptDir%\lib\Gdip2.ahk
 
+Menu, Tray, Icon, %A_ScriptDir%\poe.ico
+Menu, Tray, Tip, Path of Exile - Leveling Overlays
+
 GroupAdd, PoEWindowGrp, Path of Exile ahk_class POEWindowClass ahk_exe PathOfExile.exe
 GroupAdd, PoEWindowGrp, Path of Exile ahk_class POEWindowClass ahk_exe PathOfExileSteam.exe
 GroupAdd, PoEWindowGrp, Path of Exile ahk_class POEWindowClass ahk_exe PathOfExile_x64.exe
