@@ -1,0 +1,151 @@
+{
+	"acts" : [
+		"Act I",
+		"Act II",
+		"Act III",
+		"Act IV",
+		"Act V",
+		"Act VI",
+		"Act VII",
+		"Act VIII",
+		"Act IX",
+		"Act X"
+	],
+	"DdlA" : "Act I",
+	"DdlZ" : "Coast",
+	"zones" : [
+		{	"default" : "Coast",
+			"act" : "Act I",
+			"list" : [
+				"Coast",
+				"Mud Flats",
+				"Submerged Passage",
+				"Flooded Depths",
+				"Climb",
+				"Lower Prison",
+				"Upper Prison",
+				"Prisoner's Gate",
+				"Ship Graveyard",
+				"Cavern of Wrath",
+				"Cavern of Anger"
+			]
+		},
+		{	"default" : "Chamber of Sins 1",
+			"act" : "Act II",
+			"list" : [
+				"Chamber of Sins 1",
+				"Chamber of Sins 2",
+				"Weaver's Chambers",
+				"Wetlands",
+				"Vaal Ruins",
+				"Caverns"
+			]
+		},
+		{	"default" : "Slums",
+			"act" : "Act III",
+			"list" : [
+				"Slums",
+				"Crematorium",
+				"Sewers",
+				"Marketplace",
+				"Battlefront",
+				"Solaris Temple 1",
+				"Solaris Temple 2",
+				"Docks",
+				"Ebony Barracks",
+				"Lunaris Temple 1",
+				"Lunaris Temple 2",
+				"Imperial Gardens"
+			]
+		},
+		{	"default" : "Dried Lake",
+			"act" : "Act IV",
+			"list" : [
+				"Dried Lake",
+				"Mines 1",
+				"Mines 2",
+				"Crystal Veins",
+				"Kaom's Dream",
+				"Kaom's Stronghold",
+				"Belly of the Beast 1",
+				"Belly of the Beast 2",
+				"Harvest",
+				"Ascent"
+			]
+		},
+		{	"default" : "Slave Pens",		
+			"act" : "Act V",
+			"list" : [
+				"Slave Pens",
+				"Control Blocks",
+				"Oriath Square",
+				"Templar Courts",
+				"Chamber of Innocence",
+				"Torched Courts",
+				"Ruined Square",
+				"Ossuary",
+				"Reliquary"
+			]
+		},
+		{	"default" : "Coast",
+			"act" : "Act VI",
+			"list" : [
+				"Coast",
+				"Mud Flats",
+				"Karui Fortress",
+				"Ridge",
+				"Lower Prison",
+				"Prisoner's Gate",
+				"Riverways",
+				"Cavern of Anger",
+				"Brine King's Reef"
+			]
+		},
+		{	"default" : "Crossroads",		
+			"act" : "Act VII",
+			"list" : [
+				"Crossroads",
+				"Crypt 1",
+				"Crypt 2",
+				"Chamber of Sins 1",
+				"Chamber of Sins 2",
+				"Den",
+				"Vaal City"
+			]
+		},
+		{	"default" : "Toxic Conduits",		
+			"act" : "Act VIII",
+			"list" : [
+				"Toxic Conduits",
+				"Doedre's Cesspool",
+				"Quay",
+				"Grain Gate",
+				"Solaris Temple 1",
+				"Solaris Temple 2",
+				"Bath House",
+				"Lunaris Concourse",
+				"Lunaris Temple 1",
+				"Lunaris Temple 2"
+			]
+		},
+		{	"default" : "Descent",		
+			"act" : "Act IX",
+			"list" : [
+				"Descent",
+				"Vastiri Desert",
+				"Oasis",
+				"Foothills",
+				"Tunnel",
+				"Quarry",
+				"Refinery",
+				"Belly of the Beast"
+			]
+		},
+		{	"default" : "Ravaged Square",
+			"act" : "Act X",
+			"list" : [
+				"Ravaged Square"
+			]
+		}
+	]
+}
