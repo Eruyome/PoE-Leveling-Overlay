@@ -356,7 +356,11 @@ GetDelimitedZoneListString(data, act) {
             }
         }        
 	}
-	Return RegExReplace(dList, "^\|")
+    dList := RegExReplace(dList, "^\|")
+    _temp := RegExReplace(dList, "\|", "", count)
+    dList := count = 1 ? dList . "|" : dList 
+    
+	Return dList
 }
 
 GetDefaultZone(zones, act) {
@@ -434,9 +438,7 @@ changeAct:
     }
     
     GuiControl,,DdlZ, % "|" test := GetDelimitedZoneListString(data.zones, DdlA)
-    msgbox % test
-    DdlZ := GetDefaultZone(data.zones, DdlA)
-    
+    DdlZ := GetDefaultZone(data.zones, DdlA)    
 
     GoSub, UpdateImages
     GoSub, ActivatePOE
