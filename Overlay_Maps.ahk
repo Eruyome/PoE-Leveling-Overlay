@@ -41,9 +41,15 @@ global xPosXPRange := xPosSkills + skillsWidth + 5
 global PoEWindowHwnd := ""
 WinGet, PoEWindowHwnd, ID, ahk_group PoEWindowGrp
 
+global xp_active := false
+global skills_active := false
+global layout_active := false
+global image_active := false
+
 Gosub, DrawGUI1
 Gosub, DrawGUI2_1
 Gosub, DrawGUI3_1
+SetTimer, ShowGuiTimer, 500
 
 Return
 
@@ -147,7 +153,7 @@ return
  
  
 DrawGUI2_1:
-    Gui, 2:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop
+    Gui, 2:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop +hwndSkillGemsWindow
     Gui, 2:font, s10
     WinSet, Transparent, %opacity%
 	
@@ -195,7 +201,7 @@ DrawGUI3_1:
         xPos := xPosLayoutParent + (A_Index - 1) * 110 + (5 * A_Index)
 
         If (FileExist(filepath)) {
-            Gui, Image%A_Index%:New, -resize -SysMenu -Caption +AlwaysOnTop
+            Gui, Image%A_Index%:New, -resize -SysMenu -Caption +AlwaysOnTop +hwndImage%A_Index%Window
             Gui, Image%A_Index%:Add, Picture, VPic%A_Index% x0 y0 w110 h80, %filepath%
             Gui, Image%A_Index%:Show, w110 h80 x%xPos% y5, Image%A_Index%
             Gui, Image%A_Index%:+OwnerParent
@@ -292,6 +298,65 @@ changeZone:
     }
 return
 
+ShowGuiTimer:
+    ; check all if one of the windows is active (focused)
+    poe_active := WinActive("ahk_id" PoEWindowHwnd)
+    xp_active := WinActive("ahk_id" XpWindow)
+    skills_active := WinActive("ahk_id" SkillGemsWindow)
+    layout_active := WinActive("ahk_id" ParentWindow)
+    controls_active := WinActive("ahk_id" Controls)
+    
+    image_active := false
+    Loop, % maxImages {
+        iid := Image%A_Index%Window
+        If (WinActive("ahk_id" iid)) {
+            image_active := true
+        }       
+    }
+    
+    If (poe_active or (xp_active or skills_active or layout_active or image_active or controls_active)) {
+        ; show all gui windows
+        GoSub, ShowAllWindows
+    } Else {
+        GoSub, HideAllWindows
+    }
+return
+
+ShowAllWindows:
+    If (not layout_active) {
+        Gui, Parent:Show, NoActivate
+    }
+    If (not controls_active) {
+        Gui, Controls:Show, NoActivate
+        Gui, Controls:+OwnerParent
+    }
+    
+    If (not image_active) {
+        Loop, % maxImages {
+            Gui, Image%A_Index%:Show, NoActivate
+            Gui, Image%A_Index%:+OwnerParent
+        }
+    }
+    
+    If (not skills_active) {
+        Gui, 1:Show, NoActivate
+    }    
+    If (not xp_active) {
+        Gui, 2:Show, NoActivate
+    }
+return
+
+HideAllWindows:
+    Gui, Parent:Cancel
+    Gui, Controls:Cancel
+    
+    Loop, % maxImages {
+        Gui, Image%A_Index%:Cancel
+    }
+    
+    Gui, 1:Cancel
+    Gui, 2:Cancel
+return
 
 GuiClose:
 ExitApp
