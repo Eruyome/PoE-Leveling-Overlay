@@ -127,7 +127,6 @@ return
  
 DrawGUI1:
     Gui, 1:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop
-    WinSet, Transparent, %opacity%
     Gui, 1:Add, Text, x0 y5, XP Range
     Gui, 1:Add, Text, x0 y+5, 1-15 | 3
     Gui, 1:Add, Text, x0 y+5, 16-31 | 4
@@ -174,19 +173,41 @@ DrawGUI2_1:
 return
 
 DrawGUI3_1:
-    Gui, 3:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop
-    Gui, 3:font, s10
-    Gui, 3:Add, DropDownList, VDdlA GchangeAct x0 y82 w90 h200 , % GetDelimitedActListString(data.zones, "Act I")
-    Gui, 3:Add, DropDownList, VDdlZ GchangeZone x92 y82 w120 h250 , % GetDelimitedZoneListString(data.zones, "Act I")
+    Gui, Parent:New, +AlwaysOnTop +ToolWindow +hwndParentWindow
+    Gui, Parent:Color, brown
+    Gui, Parent:Show, w800 h100 x500 y5
+    WinSet, TransColor, brown, A
+    ; make tooltip clickthrough and remove borders
+	WinSet, ExStyle, +0x20, ahk_id %ParentWindow% ; 0x20 = WS_EX_CLICKTHROUGH
+    WinSet, Style, -0xC00000, ahk_id %ParentWindow%
     
+    xParent := 696
     Loop, 5 {
-        filepath := "" A_ScriptDir "\Overlays\" data.DdlA "\" data.DdlZ "_Seed_" A_Index ".png" ""
-        xPos := (A_Index - 1) * 110
+        filepath := "" A_ScriptDir "\Overlays\" data.DdlA "\" data.DdlZ "_Seed_" A_Index ".jpg" ""
+        xPos := xParent + (A_Index - 1) * 110 + (5 * A_Index)
+
         If (FileExist(filepath)) {
-            Gui, 3:Add, Picture, VPic%A_Index% x%xPos% y0 w110 h80 , %filepath%
+            Gui, Image%A_Index%:New, -resize -SysMenu -Caption +AlwaysOnTop
+            Gui, Image%A_Index%:Add, Picture, VPic%A_Index% x0 y0 w110 h80, %filepath%
+            Gui, Image%A_Index%:Show, w110 h80 x%xPos% y5, Image%A_Index%
+            Gui, Image%A_Index%:+OwnerParent
+            Gui, Image%A_Index%: +LastFound
+            SubhWnd := WinExist()
+            ;DllCall("SetParent", "uint", SubhWnd, "uint", Layouts)
+
+            WinGetPos, X, Y, Width, Height, ahk_id %SubhWnd%
         }        
     }
-    Gui, 3:Show, x696 y8 h106 w550 NoActivate, Gui 3
+    
+    Gui, Controls:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop +hwndControls
+    Gui, Controls:Color, gray
+    Gui, Controls:Add, DropDownList, VDdlA GchangeAct x0 y0 w90 h200 , % GetDelimitedActListString(data.zones, "Act I")
+    Gui, Controls:Add, DropDownList, VDdlZ GchangeZone x+5 y0 w120 h250 , % GetDelimitedZoneListString(data.zones, "Act I")
+    Gui, Controls:+OwnerParent
+    xPos := xParent + 5
+    Gui, Controls:Show, h21 w215 x%xPos% y88, Controls
+    ;DllCall("SetParent", ptr, Controls, ptr, Layouts)
+
     gui_3_toggle := 1
 return
 
@@ -199,8 +220,7 @@ GetDelimitedActListString(data, act) {
         If (zone.act = act) {
             dList .= "|"
         }        
-	}
-    
+	}    
 	Return RegExReplace(dList, "^\|")
 }
 
@@ -217,7 +237,6 @@ GetDelimitedZoneListString(data, act) {
             }
         }        
 	}
-
 	Return RegExReplace(dList, "^\|")
 }
 
@@ -230,22 +249,30 @@ GetDefaultZone(zones, act) {
 }
 
 changeAct:
-    Gui, Submit, NoHide
-
+    Gui, Controls:Submit, NoHide
+    
+    Loop, 5 {
+        Gui, Image%A_Index%:Submit, NoHide    
+    }
+    
     GuiControl,,DdlZ, % "|" GetDelimitedZoneListString(data.zones, DdlA)
     DdlZ := GetDefaultZone(data.zones, DdlA)
-
+    
     Loop, 5 {
-        filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".png" ""    
+        filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""    
         GuiControl,,Pic%A_Index%, *w110 *h80 %filepath%
     }
 return
 
 changeZone:
-    Gui, Submit, NoHide
+    Gui, Controls:Submit, NoHide
     
     Loop, 5 {
-        filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".png" ""
+        Gui, Image%A_Index%:Submit, NoHide    
+    }
+    
+    Loop, 5 {
+        filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""
         GuiControl,,Pic%A_Index%, *w110 *h80 %filepath%
     }
 return
