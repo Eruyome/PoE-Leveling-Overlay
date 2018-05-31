@@ -36,7 +36,7 @@ linenumber := 1
 global maxImages := 5
 global xPosLayoutParent := Round(A_ScreenWidth / 2) - Round(((maxImages * 110) + (maxImages * A_Index)) / 2)
 global xPosSkills := xPosLayoutParent + ((maxImages * 110) + (maxImages * A_Index))
-global skillsWidth := 330
+global skillsWidth := 330   ; max width
 global xPosXPRange := xPosSkills + skillsWidth + 2
 
 global PoEWindowHwnd := ""
@@ -217,8 +217,8 @@ DrawGUI3_1:
 
         If (FileExist(filepath)) {
             Gui, Image%A_Index%:New, -resize -SysMenu -Caption +AlwaysOnTop +hwndImage%A_Index%Window
-            Gui, Image%A_Index%:Add, Picture, VPic%A_Index% x0 y0 w110 h80, %filepath%
-            Gui, Image%A_Index%:Show, w110 h80 x%xPos% y5, Image%A_Index%
+            Gui, Image%A_Index%:Add, Picture, VPic%A_Index% x0 y0 w110 h60, %filepath%
+            Gui, Image%A_Index%:Show, w110 h60 x%xPos% y5, Image%A_Index%
             Gui, Image%A_Index%:+OwnerParent
             Gui, Image%A_Index%: +LastFound
         }        
@@ -231,7 +231,7 @@ DrawGUI3_1:
     Gui, Controls:Add, DropDownList, VDdlZ GchangeZone x+5 y0 w120 h250 , % GetDelimitedZoneListString(data.zones, "Act I")
     Gui, Controls:+OwnerParent
     xPos := xPosLayoutParent + 5
-    Gui, Controls:Show, h21 w215 x%xPos% y88, Controls
+    Gui, Controls:Show, h21 w215 x%xPos% y68, Controls
 
     gui_3_toggle := 1
 return
@@ -286,7 +286,7 @@ changeAct:
     Loop, % maxImages {
         filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""
         If (FileExist(filepath)) {
-            GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%        
+            GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h60 %filepath%        
             Gui, Image%A_Index%:Show
             Gui, Image%A_Index%:+OwnerParent
         } Else {
@@ -306,7 +306,7 @@ changeZone:
     Loop, % maxImages {
         filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""
         If (FileExist(filepath)) {
-            GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%
+            GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h60 %filepath%
             Gui, Image%A_Index%:Show
             Gui, Image%A_Index%:+OwnerParent
         } Else {
