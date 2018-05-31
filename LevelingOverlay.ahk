@@ -37,6 +37,7 @@ gui_2_toggle := 0
 linenumber := 1
 
 global maxImages := 5
+global windowTrans := 180
 global xPosLayoutParent := Round(A_ScreenWidth / 2) - Round(((maxImages * 110) + (maxImages * A_Index)) / 2)
 global xPosSkills := xPosLayoutParent + ((maxImages * 110) + (maxImages * A_Index))
 global skillsWidth := 330   ; max width
@@ -228,19 +229,21 @@ DrawGUI3_1:
     WinSet, Style, -0xC00000, ahk_id %ParentWindow%
     
     Loop, % maxImages {
-        filepath := "" A_ScriptDir "\Overlays\" data.DdlA "\" data.DdlZ "_Seed_" A_Index ".jpg" ""
+        filepath := "" A_ScriptDir "\Overlays\" data.DdlA "\" data.DdlZ "_Seed_" A_Index ".jpg" ""        
         xPos := xPosLayoutParent + (A_Index - 1) * 110 + (5 * A_Index)
-
+        
         Gui, Image%A_Index%:New, -resize -SysMenu -Caption +AlwaysOnTop +hwndImage%A_Index%Window
+        id := Image%A_Index%Window
         If (FileExist(filepath)) {
-            Gui, Image%A_Index%:Add, Picture, VPic%A_Index% x0 y0 w110 h60, %filepath%            
+            Gui, Image%A_Index%:Add, Picture, VPic%A_Index% x0 y0 w110 h60, %filepath%
         }
         Gui, Image%A_Index%:Show, w110 h60 x%xPos% y5, Image%A_Index%
         Gui, Image%A_Index%:+OwnerParent
         
-        If (not FileExist(filepath)) {
-            id := Image%A_Index%Window
+        If (not FileExist(filepath)) {            
             WinSet, Transparent, 0, ahk_id %id%
+        } Else {
+            WinSet, Transparent, %windowTrans%, ahk_id %id%
         }
     }
     
@@ -309,7 +312,7 @@ changeAct:
         
         If (FileExist(filepath)) {
             GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h60 %filepath%
-            WinSet, Transparent, 255, ahk_id %id%            
+            WinSet, Transparent, %windowTrans%, ahk_id %id%            
         } 
         Else {
             WinSet, Transparent, 0, ahk_id %id%
@@ -333,7 +336,7 @@ changeZone:
         
         If (FileExist(filepath)) {
             GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h60 %filepath%
-            WinSet, Transparent, 255, ahk_id %id%            
+            WinSet, Transparent, %windowTrans%, ahk_id %id%            
         } 
         Else {
             WinSet, Transparent, 0, ahk_id %id%
