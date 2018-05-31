@@ -49,7 +49,7 @@ global image_active := false
 Gosub, DrawGUI1
 Gosub, DrawGUI2_1
 Gosub, DrawGUI3_1
-SetTimer, ShowGuiTimer, 500
+SetTimer, ShowGuiTimer, 250
 
 Return
 
@@ -277,6 +277,7 @@ changeAct:
             Gui, Image%A_Index%:Cancel
         }
     }
+    GoSub, ActivatePOE
 return
 
 changeZone:
@@ -296,6 +297,7 @@ changeZone:
             Gui, Image%A_Index%:Cancel
         }
     }
+    GoSub, ActivatePOE
 return
 
 ShowGuiTimer:
