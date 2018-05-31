@@ -307,9 +307,7 @@ DrawGUI3_1:
         
         Gui, Image%A_Index%:New, -resize -SysMenu -Caption +AlwaysOnTop +hwndImage%A_Index%Window
         id := Image%A_Index%Window
-        If (FileExist(filepath)) {
-            Gui, Image%A_Index%:Add, Picture, VPic%A_Index% x0 y0 w110 h60, %filepath%
-        }
+        Gui, Image%A_Index%:Add, Picture, VPic%A_Index% x0 y0 w110 h60, %filepath%
         Gui, Image%A_Index%:Show, w110 h60 x%xPos% y5, Image%A_Index%
         Gui, Image%A_Index%:+OwnerParent
         
