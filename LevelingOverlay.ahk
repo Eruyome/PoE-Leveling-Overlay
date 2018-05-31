@@ -45,6 +45,7 @@ global xPosXPRange := xPosSkills + skillsWidth + 2
 
 global PoEWindowHwnd := ""
 WinGet, PoEWindowHwnd, ID, ahk_group PoEWindowGrp
+global  ControlsWindow := ""
 
 global xp_active := false
 global skills_active := false
@@ -146,8 +147,78 @@ return
 !F2::
 return
 
+#IfWinActive, ahk_group PoEWindowGrp
+$WheelUp::
+    ; $ prevents triggering this when using Send {WheelUp}
+    MouseGetPos, mouseX, mouseY
+    mouseOverControlOrImage := CheckIfMouseInRegion("up")
+    If (mouseOverControlOrImage) {
+        ; trigger zone/act changes   
+    }
+    Else {
+        Send {WheelUp}
+    }
+return
+
+#IfWinActive, ahk_group PoEWindowGrp
+$WheelDown::
+    ; $ prevents triggering this when using Send {WheelDown}
+    mouseOverControlOrImage := CheckIfMouseInRegion("down")
+    If (mouseOverControlOrImage) {
+        ; trigger zone/act changes        
+    }
+    Else {
+        Send {WheelDown}
+    }    
+return
+
  
 ;========== Subs and Functions =======
+ 
+CheckIfMouseInRegion(direction) {
+    MouseGetPos, mouseX, mouseY, window, winControl
+    
+    overImage := false
+    Loop, % maxImages {
+        id := Image%A_Index%Window
+        If (id == window) {
+            overImage := true
+        }
+    }
+
+    overDropdownAct := false
+    overDropdownZone := false
+    If (window == ControlsWindow) {
+        If (winControl = "ComboBox1") {
+            overDropdownAct := true
+        }
+        Else If (winControl = "ComboBox2") {
+            overDropdownZone := true
+        }
+    }
+    
+    If (overDropdownZone or overImage) {
+        ; change zones
+        If (direction = "up") {
+            GoSub, cycleZoneUp
+        } Else If (direction = "down") {
+            GoSub, cycleZoneDown
+        }
+
+        Return true
+    } Else If (overDropDownAct) {
+        ; change act
+        If (direction = "up") {
+            GoSub, cycleActUp
+        } Else If (direction = "down") {
+            GoSub, cycleActDown
+        }
+        
+        Return true
+    }
+    
+    Return false
+}
  
 ActivatePOE:
     WinActivate, ahk_id %PoEWindowHwnd%
@@ -247,7 +318,7 @@ DrawGUI3_1:
         }
     }
     
-    Gui, Controls:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop +hwndControls
+    Gui, Controls:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop +hwndControlsWindow
     Gui, Controls:Color, gray
     Gui, Controls:Font, s9, Arial
     Gui, Controls:Add, DropDownList, VDdlA GchangeAct x0 y0 w90 h200 , % GetDelimitedActListString(data.zones, "Act I")
@@ -296,30 +367,76 @@ GetDefaultZone(zones, act) {
 	}
 }
 
+GetDifferentZone(direction, zones, act, current) {
+    newZone := ""
+    indexShift := direction = "next" ? 1 : -1
+    first := ""
+    last := ""
+    
+    For key, zone in zones {
+        If (zone.act = act) {
+            Loop, % zone["list"].Length()
+            {
+                If (A_Index = 1) {
+                    first := zone.list[A_Index]
+                }
+                If (A_Index = zone.list.MaxIndex()) {                
+                    last := zone.list[A_Index]
+                }
+                
+                If (zone.list[A_Index] = current) {
+                    newZone := zone.list[A_Index + indexShift] 
+                }
+            }
+            break
+        } 
+	}
+    
+    If (not StrLen(newZone)) {
+        newZone := direction = "next" ? first : last
+    }
+    
+    Return newZone
+}
+
+GetDifferentAct(direction, acts, current) {
+    newAct := ""
+    indexShift := direction = "next" ? 1 : -1
+    first := ""
+    last := ""
+    
+    Loop, % acts.Length()
+    {
+        If (A_Index = 1) {
+            first := acts[A_Index]
+        }
+        If (A_Index = acts.MaxIndex()) {                
+            last := acts[A_Index]
+        }
+        
+        If (acts[A_Index] = current) {
+            newAct := acts[A_Index + indexShift] 
+        }
+    }
+    
+    If (not StrLen(newAct)) {
+        newAct := direction = "next" ? first : last
+    }
+
+    Return newAct
+}
+
 changeAct:
     Gui, Controls:Submit, NoHide
-    
+
     Loop, % maxImages {
-        Gui, Image%A_Index%:Submit, NoHide    
+        Gui, Image%A_Index%:Submit, NoHide
     }
     
     GuiControl,,DdlZ, % "|" GetDelimitedZoneListString(data.zones, DdlA)
     DdlZ := GetDefaultZone(data.zones, DdlA)
 
-    Loop, % maxImages {
-        filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""
-        id := Image%A_Index%Window
-        
-        If (FileExist(filepath)) {
-            GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h60 %filepath%
-            WinSet, Transparent, %windowTrans%, ahk_id %id%            
-        } 
-        Else {
-            WinSet, Transparent, 0, ahk_id %id%
-        }
-        Gui, Image%A_Index%:Show
-        Gui, Image%A_Index%:+OwnerParent
-    }
+    GoSub, UpdateImages
     GoSub, ActivatePOE
 return
 
@@ -330,6 +447,31 @@ changeZone:
         Gui, Image%A_Index%:Submit, NoHide
     }
     
+    GoSub, UpdateImages
+    GoSub, ActivatePOE
+return
+
+cycleZoneUp:
+    Gui, Controls:Submit, NoHide
+    _zone := GetDifferentZone("next", data.zones, DdlA, DdlZ)
+return
+
+cycleZoneDown:
+    Gui, Controls:Submit, NoHide
+    _zone := GetDifferentZone("previous", data.zones, DdlA, DdlZ)
+return
+
+cycleActUp:
+    Gui, Controls:Submit, NoHide
+    _zone := GetDifferentAct("next", data.acts, DdlA)
+return
+
+cycleActDown:
+    Gui, Controls:Submit, NoHide
+    _zone := GetDifferentAct("previous", data.acts, DdlA)
+return
+
+UpdateImages:
     Loop, % maxImages {
         filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""
         id := Image%A_Index%Window
@@ -344,7 +486,6 @@ changeZone:
         Gui, Image%A_Index%:Show
         Gui, Image%A_Index%:+OwnerParent
     }
-    GoSub, ActivatePOE
 return
 
 ShowGuiTimer:
@@ -353,7 +494,7 @@ ShowGuiTimer:
     xp_active := WinActive("ahk_id" XpWindow)
     skills_active := WinActive("ahk_id" SkillGemsWindow)
     layout_active := WinActive("ahk_id" ParentWindow)
-    controls_active := WinActive("ahk_id" Controls)
+    controls_active := WinActive("ahk_id" ControlsWindow)
     
     image_active := false
     Loop, % maxImages {
