@@ -422,7 +422,7 @@ GetDifferentAct(direction, acts, current) {
     If (not StrLen(newAct)) {
         newAct := direction = "next" ? first : last
     }
-
+    
     Return newAct
 }
 
@@ -433,8 +433,10 @@ changeAct:
         Gui, Image%A_Index%:Submit, NoHide
     }
     
-    GuiControl,,DdlZ, % "|" GetDelimitedZoneListString(data.zones, DdlA)
+    GuiControl,,DdlZ, % "|" test := GetDelimitedZoneListString(data.zones, DdlA)
+    msgbox % test
     DdlZ := GetDefaultZone(data.zones, DdlA)
+    
 
     GoSub, UpdateImages
     GoSub, ActivatePOE
@@ -454,26 +456,53 @@ return
 cycleZoneUp:
     Gui, Controls:Submit, NoHide
     _zone := GetDifferentZone("next", data.zones, DdlA, DdlZ)
+    GuiControl, Controls:Choose, DdlZ, % "|" _zone
+    
+    GoSub, UpdateImages
+    GoSub, ActivatePOE
 return
 
 cycleZoneDown:
     Gui, Controls:Submit, NoHide
     _zone := GetDifferentZone("previous", data.zones, DdlA, DdlZ)
+    GuiControl, Controls:Choose, DdlZ, % "|" _zone
+    
+    GoSub, UpdateImages
+    GoSub, ActivatePOE
 return
 
 cycleActUp:
     Gui, Controls:Submit, NoHide
     _zone := GetDifferentAct("next", data.acts, DdlA)
+    
+    Loop, % maxImages {
+        Gui, Image%A_Index%:Submit, NoHide
+    }
+    
+    GuiControl, Controls:Choose, DdlA, % "|" _zone
+
+    GoSub, UpdateImages
+    GoSub, ActivatePOE
 return
 
 cycleActDown:
     Gui, Controls:Submit, NoHide
     _zone := GetDifferentAct("previous", data.acts, DdlA)
+
+    Loop, % maxImages {
+        Gui, Image%A_Index%:Submit, NoHide
+    }
+
+    GuiControl, Controls:Choose, DdlA, % "|" _zone
+
+    GoSub, UpdateImages
+    GoSub, ActivatePOE
 return
 
 UpdateImages:
     Loop, % maxImages {
         filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""
+
         id := Image%A_Index%Window
         
         If (FileExist(filepath)) {
