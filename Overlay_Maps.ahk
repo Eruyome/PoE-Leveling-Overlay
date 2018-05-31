@@ -266,6 +266,7 @@ changeAct:
         If (FileExist(filepath)) {
             GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%        
             Gui, Image%A_Index%:Show
+            Gui, Image%A_Index%:+OwnerParent
         } Else {
             Gui, Image%A_Index%:Cancel
         }
@@ -284,6 +285,7 @@ changeZone:
         If (FileExist(filepath)) {
             GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%
             Gui, Image%A_Index%:Show
+            Gui, Image%A_Index%:+OwnerParent
         } Else {
             Gui, Image%A_Index%:Cancel
         }
