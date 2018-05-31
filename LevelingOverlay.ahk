@@ -38,8 +38,10 @@ linenumber := 1
 
 global maxImages := 5
 global windowTrans := 180
-global xPosLayoutParent := Round(A_ScreenWidth / 2) - Round(((maxImages * 110) + (maxImages * A_Index)) / 2)
-global xPosSkills := xPosLayoutParent + ((maxImages * 110) + (maxImages * A_Index))
+global totalImageMargins := 5 * maxImages
+
+global xPosLayoutParent := Round(A_ScreenWidth / 2) - Round(((maxImages * 110) + (totalImageMargins)) / 2)
+global xPosSkills := xPosLayoutParent + ((maxImages * 110) + totalImageMargins)
 global skillsWidth := 330   ; max width
 global xPosXPRange := xPosSkills + skillsWidth + 2
 
