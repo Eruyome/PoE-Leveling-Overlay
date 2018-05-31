@@ -133,15 +133,15 @@ return
  
 DrawGUI1:
     Gui, 1:+E0x20 -Caption +LastFound +ToolWindow +AlwaysOnTop +hwndXpWindow
-    Gui, 1:Add, Text, x0 y5, XP Range
-    Gui, 1:Add, Text, x0 y+5, 1-15 | 3
-    Gui, 1:Add, Text, x0 y+5, 16-31 | 4
-    Gui, 1:Add, Text, x0 y+5, 32-47 | 5
-    Gui, 1:Add, Text, x0 y+5, 48-63 | 6
-    Gui, 1:Add, Text, x0 y+5, 64-79 | 7
-    Gui, 1:Add, Text, x0 y+5, 80+ | 8
+    Gui, 1:Add, Text, x5 y5, XP Range
+    Gui, 1:Add, Text, x5 y+5, 1-15 | 3
+    Gui, 1:Add, Text, x5 y+5, 16-31 | 4
+    Gui, 1:Add, Text, x5 y+5, 32-47 | 5
+    Gui, 1:Add, Text, x5 y+5, 48-63 | 6
+    Gui, 1:Add, Text, x5 y+5, 64-79 | 7
+    Gui, 1:Add, Text, x5 y+5, 80+ | 8
     
-    Gui, 1:Show, x%xPosXPRange% y8 w60 h130, Gui 1    
+    Gui, 1:Show, x%xPosXPRange% y5 w60 h130, Gui 1    
     gui_1_toggle := 1
 return
  
@@ -167,7 +167,7 @@ DrawGUI2_1:
 			{
 				break
 			}
-			Gui, 2:Add, Text, x0 y+5, %ReadLine%
+			Gui, 2:Add, Text, x5 y+5, %ReadLine%
 		}
 		if ReadLine = 
 			{
@@ -175,17 +175,18 @@ DrawGUI2_1:
 			}
 	}
 
-    Gui, 2:Show, x%xPosSkills% y8 w%skillsWidth% h180, Gui 2
+    Gui, 2:Show, x%xPosSkills% y5 w%skillsWidth% h180, Gui 2
     gui_2_toggle := 1
 return
 
 DrawGUI3_1:
     Gui, Parent:New, +AlwaysOnTop +ToolWindow +hwndParentWindow
     Gui, Parent:Color, brown
-    Gui, Parent:Show, w800 h100 x500 y5
+    Gui, Parent:Show, w100 h80 x%xPosLayoutParent% y5
     WinSet, TransColor, brown, A
     
     ; make tooltip clickthrough and remove borders
+    ; doesn't work
 	WinSet, ExStyle, +0x20, ahk_id %ParentWindow% ; 0x20 = WS_EX_CLICKTHROUGH
     WinSet, Style, -0xC00000, ahk_id %ParentWindow%
     
@@ -199,7 +200,6 @@ DrawGUI3_1:
             Gui, Image%A_Index%:Show, w110 h80 x%xPos% y5, Image%A_Index%
             Gui, Image%A_Index%:+OwnerParent
             Gui, Image%A_Index%: +LastFound
-            SubhWnd := WinExist()
         }        
     }
     
@@ -262,8 +262,13 @@ changeAct:
     DdlZ := GetDefaultZone(data.zones, DdlA)
 
     Loop, % maxImages {
-        filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""    
-        GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%
+        filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""
+        If (FileExist(filepath)) {
+            GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%        
+            Gui, Image%A_Index%:Show
+        } Else {
+            Gui, Image%A_Index%:Cancel
+        }
     }
 return
 
@@ -276,7 +281,12 @@ changeZone:
     
     Loop, % maxImages {
         filepath := "" A_ScriptDir "\Overlays\" DdlA "\" DdlZ "_Seed_" A_Index ".jpg" ""
-        GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%
+        If (FileExist(filepath)) {
+            GuiControl,Image%A_Index%:,Pic%A_Index%, *w110 *h80 %filepath%
+            Gui, Image%A_Index%:Show
+        } Else {
+            Gui, Image%A_Index%:Cancel
+        }
     }
 return
 
